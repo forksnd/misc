@@ -1,0 +1,14 @@
+More on data
+
+<p>The short-hand use of curly brackets <b>{}</b> can be used for data where all its components are not quoted. <b>{a b}</b> is equivalent to <b>'[,a ,b]</b>.
+<p>
+<ul>
+<li><a class="example">{3 [* 2 2] [+ 2 3] '[+ 3 3]}</a>
+</ul>
+</p>
+<p>Unquoting data allows drawings and data to contain the results from calculations.</p>
+<ul>
+<li><a class="example">[let '[x:100 y:100 w:50]
+	'{{'m x y} {'l [+ x w] y} {'l [+ x w] [+ y w]} {'l x [+ y w]} '[z]}
+]</a>
+</ul>

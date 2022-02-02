@@ -1,0 +1,20 @@
+Higher order maps
+
+<p>There are some bootstrapped map versions of standard higher order functions. <b>foldm, mapm, filter, zipWith</b>. The documentation for these functions provides more examples of what they can do.</p> 
+<p>
+<ul>
+<li><a class="example">[mapm '[1 2 3 4 5] [lambda '[v:1] '{v [+ v 1]}]]</a>
+<li><a class="example">[filter '[5 4 3 2 1] [lambda '[v:value] '[< v 4]]]</a>
+<li><a class="example">[filter '["will" "sam" "isaac" "jemima"] [lambda '[v:value] '[< [length v] 5]]]</a>
+<li><a class="example">[foldm {1 2 3 4 5} f:[lambda '[v:value r:1] '[* v r]] id:1]</a>
+</ul>
+</p>
+</ul>
+</p>
+<p>It is also possible to do partial application using <b>partial-app</b>. This allows both the fixing and renaming of arguments.
+<ul>
+<li>Doubling: <a class="example">[[partial-app * fix:'[2:2] rename:{}] 12]</a>
+<li>Reciprocal: <a class="example">[[partial-app / fix:'[1:1] rename:{2:1}] 12]</a>
+<li>Squaring: <a class="example">[mapm '[1 2 3 4 5] [partial-app * fix:{} rename:'[2:1]]]</a>
+</ul>
+</p>

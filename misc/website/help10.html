@@ -1,0 +1,20 @@
+Recursion 2
+
+<p>Factorial can be written so that it is tail-end recursive. This usually means that it can be optimised so that the call stack does not grow indefinetly. In a lazy language like MISC this doesn't help much. A version of factorial with an accumulator simply creates a indefinite thunk rather than a stack. Thus it is possible to force evaluation with the <b>force</b> function. <b>force</b> forces the evaluation of the first argument and returns the second. Without forcing evaluation of its arguments the factorial function will fail for larger numbers as it runs out of memory.
+<p>
+<ul>
+<li><a class="example">[letrec '[
+    fac:[lambda '[n:1] '[facI [- n 1] n]]
+    facI:[lambda '[n:1 r:2]
+            '[force r
+                [if [< n 2]
+                    then: r
+                    else:[facI [- n 1] [* r n]]
+                ]
+            ]
+        ]
+    ]
+    '[fac 100]
+]</a>
+</ul>
+</p>

@@ -1,0 +1,18 @@
+More on maps
+
+<p>There are several built-in functions to manipulate maps. <b>keys, get, union, map</b> are the main functions.
+<p>
+<ul>
+<li><a class="example">[map 4 5]</a>
+<li><a class="example">[get {a:4 b:5 c:6} 'b]</a>
+<li><a class="example">[keys {a:4 b:5 c:6}]</a>
+<li><a class="example">[union '[a:10 b:40] [map 'c 80]]</a>
+</ul>
+</p>
+<p>A short cut for the function <b>get</b> is to use slashes to write values in a path-like syntax. <b>/A/B/C</b> is equivalent to <b>[get [get A B] C]</b>.
+<p>
+<ul>
+<li><a class="example">/{a:4 b:5 c:6}/'b</a>
+<li><a class="example">/'[[1 2] [a b]]/1/0</a>
+</ul>
+</p>

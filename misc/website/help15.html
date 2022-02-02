@@ -1,0 +1,67 @@
+Math Parser
+
+<p>Prefix notation might not be to your taste. Luckily writing a standard math parser is simple.</p> 
+<p>
+<a href="#" style="font-size:12; color:#000; text-decoration:none; font-family:'Courier', monospace;white-space:pre;" onclick="javascript:parent.appletFrame.miscApplet.runCode(this.text)">[<span class="fn">letrec</span> '[
+
+    <span class="key">math</span>:[<span class="fn">lambda</span> <span class="key">'[<span class="fn">eqn</span>:<span class="digits">1</span>]</span>
+        '/[<span class="fn">-expr</span> eqn <span class="digits">0</span>]/'v
+    ]
+    
+    <span class="key">binary-fn</span>:[<span class="fn">lambda</span> <span class="key">'[<span class="fn">f</span>:lhs</span> <span class="key">g</span>:rhs <span class="key">tok</span>:token <span class="key">fn</span>:f]
+        '[<span class="fn">lambda</span> <span class="key">'[<span class="fn">eqn</span>:<span class="digits">1</span></span> <span class="key">n</span>:<span class="digits">2</span>]
+            '[<span class="fn">letrec</span> '[
+                <span class="key">lhs</span>:[<span class="fn">f</span> eqn n]
+                <span class="key">rhs</span>:[<span class="fn">g</span> eqn [<span class="fn">+</span> ln <span class="digits">1</span>]]
+                <span class="key">ln</span>:/lhs/'n  <span class="key">rn</span>:/rhs/'n
+                <span class="key">lv</span>:/lhs/'v  <span class="key">rv</span>:/rhs/'v
+                ]
+                
+                '[<span class="fn">if</span> [<span class="fn">=</span> /eqn/ln tok]
+                    <span class="key">then:{n</span>:rn <span class="key">v</span>:[<span class="fn">fn</span> lv rv]}
+                    <span class="key">else</span>:lhs
+                ]
+            ]
+        ]
+    ]
+    <span class="key">unary-fn</span>:[<span class="fn">lambda</span> <span class="key">'[<span class="fn">g</span>:rhs</span> <span class="key">tok</span>:token <span class="key">fn</span>:f]
+        '[<span class="fn">binary-fn</span> <span class="key">lhs</span>:g <span class="key">rhs</span>:g <span class="key">token</span>:tok <span class="key">f</span>:[<span class="fn">lambda</span> <span class="key">'[<span class="fn">v</span>:<span class="digits">2</span>]</span> '[<span class="fn">fn</span> v]]]
+    ]
+        
+    <span class="key">-expr</span>:[<span class="fn">binary-fn</span> <span class="key">lhs</span>:+expr <span class="key">rhs</span>:-expr <span class="key">token</span>:'- <span class="key">f</span>:-]
+    <span class="key">+expr</span>:[<span class="fn">binary-fn</span> <span class="key">lhs</span>:*expr <span class="key">rhs</span>:+expr <span class="key">token</span>:'+ <span class="key">f</span>:+]
+    <span class="key">*expr</span>:[<span class="fn">binary-fn</span> <span class="key">lhs</span>:div-expr <span class="key">rhs</span>:*expr <span class="key">token</span>:'* <span class="key">f</span>:*]
+    <span class="key">div-expr</span>:[<span class="fn">binary-fn</span> <span class="key">lhs</span>:pow-expr <span class="key">rhs</span>:div-expr <span class="key">token</span>:'/ <span class="key">f</span>:/ ]
+    <span class="key">pow-expr</span>:[<span class="fn">binary-fn</span> <span class="key">lhs</span>:sin-expr <span class="key">rhs</span>:pow-expr <span class="key">token</span>:'^ <span class="key">f</span>:
+        [<span class="fn">lambda</span> <span class="key">'[<span class="fn">pow</span>:<span class="digits">0</span></span> <span class="key">a</span>:<span class="digits">1</span> <span class="key">b</span>:<span class="digits">2</span>]
+            '[<span class="fn">if</span> [<span class="fn">=</span> b <span class="digits">1</span>]
+                <span class="key">then</span>:a
+                <span class="key">else</span>:[<span class="fn">*</span> a [<span class="fn">pow</span> a [<span class="fn">-</span> b <span class="digits">1</span>]]]
+            ]
+        ]
+    ]
+    <span class="key">sin-expr</span>:[<span class="fn">unary-fn</span> <span class="key">rhs</span>:number <span class="key">token</span>:'sin <span class="key">f</span>:/Math/'sine]
+    
+    <span class="key">number</span>:[<span class="fn">lambda</span> <span class="key">'[<span class="fn">eqn</span>:<span class="digits">1</span></span> <span class="key">n</span>:<span class="digits">2</span>]
+        '[<span class="fn">let</span> <span class="key">'[<span class="fn">tok</span>:/eqn/n]</span>
+            '[<span class="fn">if</span> [<span class="fn">number?</span> tok]
+                <span class="key">then:{n</span>:[<span class="fn">+</span> n <span class="digits">1</span>] <span class="key">v</span>:tok}
+                <span class="key">else</span>:[<span class="fn">if</span> [<span class="fn">and</span> [<span class="fn">map?</span> tok] [<span class="fn">not</span> [<span class="fn">string?</span> tok]]]
+                    <span class="key">then:{n</span>:[<span class="fn">+</span> n <span class="digits">1</span>] <span class="key">v</span>:[<span class="fn">math</span> tok]}
+                    <span class="key">else:{n</span>:n <span class="key">v</span>:<span class="digits">0</span>} "Token not recognised"
+                ]
+            ]
+        ]
+    ]
+    
+    ]
+    '{
+        [<span class="fn">math</span> '[<span class="fn"><span class="digits">4</span></span> * <span class="digits">6</span> + <span class="digits">2</span>]]
+        [<span class="fn">math</span> '[<span class="fn">-<span class="digits">2</span></span> + <span class="digits">4</span> * <span class="digits">6</span>]]
+        [<span class="fn">math</span> '[<span class="fn"><span class="digits">2</span></span> ^ <span class="digits">8</span> + <span class="digits">200</span>]]
+        [<span class="fn">math</span> '[<span class="fn"><span class="digits">4</span></span> * [<span class="fn"><span class="digits">2</span></span> + <span class="digits">3</span>]]]
+        [<span class="fn">let</span> <span class="key">'[<span class="fn">pi</span>:<span class="digits">3</span>.<span class="digits">14</span></span> <span class="key">r</span>:<span class="digits">10</span>] '[<span class="fn">math</span> '[<span class="fn"><span class="digits">4</span></span> * ,pi * ,r ^ <span class="digits">2</span>]]]
+        [<span class="fn">math</span> '[<span class="fn">sin</span> <span class="digits">2</span> * <span class="digits">10</span>]]
+    }
+]</a>
+</p>

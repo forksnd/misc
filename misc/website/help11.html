@@ -1,0 +1,20 @@
+Higher order functions
+
+<p>Higher order functions are easy in MISC. Functions can be passed around as values.
+<p>
+<ul>
+<li><a class="example">[[if false then:+ else:-] 4 5]</a>
+<li><a class="example">[let '[+:* f:+] '[+ 5 [f 10 2]]]</a>
+<li><a class="example">[let '[
+    compose:[lambda '[f:1 g:2] '[lambda '[v:1] '[f [g v]]] ]
+    curry:[lambda '[f:1 a:2] '[lambda '[b:1] '[f a b]]]
+    ]
+    
+    '{
+        A:[[curry + 1] 5]
+        B:[[curry * 4] [[curry + 1] 5]]
+        C:[[compose [curry * 4] [curry + 1]] 5]
+    }
+]</a>
+</ul>
+</p>

@@ -1,0 +1,11 @@
+Lambda
+
+<p>New functions are defined using <b>lambda</b>. This takes two arguments returning a new closure. The first argument is the new function's arguments the second argument is the body of the new function <b>[lambda args body]</b>. A complete example is <a class="example">[lambda '[x:1] '[* x x]]</a>.</p>
+<p>Notice again how both arguments are data. The first argument is a map that defines the argument names. The argument map defines a mapping of new names used in the function body to names taken from when the function was called.</p>
+<p>
+<ul>
+<li><a class="example">[[lambda '[x:1] '[* x x]] 25]</a>
+<li><a class="example">[[lambda '[n:a m:b] '[* n m]] a:25 b:10]</a>
+</ul>
+</p>
+</p>

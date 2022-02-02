@@ -1,0 +1,74 @@
+Metacircular evaluator
+
+<p>A self-interpreter is an programming language interpreter that can interpret the language it is written in. A metacircular evaluator is a self-interpreter that is directly applied to the source code without any additional parsing. Thus it is only possible in langagues where the code is a data structure (homoiconicity).</p>
+<p>LISP provides perhaps the most famous <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-26.html#%_sec_4.1">example</a>. A metacircular evaluator  provides the ability to alter the semantics of the language.</p>
+<p>MISC is perhaps suited to building interpreters because it naturally handles environments because they are just maps. Below is a 55 line metacircular MISC evaluator and a few test examples.</p> 
+<p>
+<a href="#" style="font-size:12; color:#000; text-decoration:none; font-family:'Courier', monospace;white-space:pre;" onclick="javascript:parent.appletFrame.miscApplet.runCode(this.text)">[<span class="fn">let</span> [<span class="fn">let</span> '[<span class="key">original-env</span>:[<span class="fn">environment]]</span>
+    '[<span class="fn">letrec</span> '[
+      <span class="comment">#:"Data is determined by the 'data metadata value."</span>
+      <span class="key">isName?</span>:[<span class="fn">lambda</span> '[<span class="key">v</span>:<span class="digits">1</span>] '/[<span class="fn">meta</span> v]/'is-name]
+      <span class="key">isStatic?</span>:[<span class="fn">lambda</span> '[<span class="key">v</span>:<span class="digits">1</span>] '[<span class="fn">or</span> [<span class="fn">lambda?</span> v] [<span class="fn">not</span> /[<span class="fn">meta</span> v]/'data]]]
+      <span class="key">isData?</span>:[<span class="fn">lambda</span> '[<span class="key">v</span>:<span class="digits">1</span>] '[<span class="fn">or</span> [<span class="fn">isStatic?</span> v] [<span class="fn">></span> /[<span class="fn">meta</span> v]/'data <span class="digits">1</span>]]]
+      
+      <span class="comment">#:"Changes the data metadata attribute, any item that is then not data is evaluated further."</span>
+      <span class="key">dataDelta</span>:[<span class="fn">lambda</span> '[<span class="key">o</span>:<span class="digits">1</span> <span class="key">dd</span>:delta <span class="key">env</span>:env]
+        '[<span class="fn">if</span> [<span class="fn">isStatic?</span> o]
+          <span class="key">then</span>:o
+          <span class="key">else</span>:[<span class="fn">let</span> '[<span class="key">no</span>:[<span class="fn">meta+</span> o <span class="key">{data</span>:[<span class="fn">+</span> /[<span class="fn">meta</span> o]/'data dd]}]]
+          	'[<span class="fn">if</span> [<span class="fn">isData?</span> no] <span class="key">then</span>:no <span class="key">else</span>:[<span class="fn">myeval</span> no <span class="key">env</span>:env]]
+          ]
+        ]
+      ]
+      <span class="comment">#:"Recursively changes the data metadata value."</span>
+      <span class="key">dataDeltaR</span>:[<span class="fn">lambda</span> '[<span class="key">o</span>:<span class="digits">1</span> <span class="key">env</span>:env <span class="key">dd</span>:delta]
+      	'[<span class="fn">if</span> [<span class="fn">and</span> [<span class="fn">map?</span> o] [<span class="fn">not</span> [<span class="fn">string?</span> o]]]
+              <span class="key">then</span>:[<span class="fn">dataDelta</span> [<span class="fn">meta=</span> [<span class="fn">mapm</span> o [<span class="fn">lambda</span> '[<span class="key">v</span>:<span class="digits">1</span>] '[<span class="fn">dataDeltaR</span> v <span class="key">delta</span>:dd <span class="key">env</span>:env]]] [<span class="fn">meta</span> o]] <span class="key">delta</span>:dd <span class="key">env</span>:env]
+              <span class="key">else</span>:[<span class="fn">dataDelta</span> o <span class="key">delta</span>:dd <span class="key">env</span>:env]
+         ]
+      ]
+      <span class="comment">#:"Runs a program."</span>
+      <span class="key">myeval</span>:[<span class="fn">lambda</span> '[<span class="key">prgm</span>:<span class="digits">1</span> <span class="key">env</span>:env]
+      	'[<span class="fn">if</span> [<span class="fn">isName?</span> prgm]
+      		<span class="key">then</span>:/env/prgm
+      		<span class="key">else</span>:[<span class="fn">apply</span> /prgm/<span class="digits">0</span> prgm env]
+        ]
+      ]
+      <span class="comment">#:"The main function that evaluates a program passed in as data."</span>
+      <span class="key">evaluate</span>:[<span class="fn">lambda</span> '[<span class="key">pgrm</span>:<span class="digits">1</span>] '[<span class="fn">dataDeltaR</span> pgrm <span class="key">env</span>:m-environment <span class="key">delta</span>:<span class="digits">0</span>]]
+      
+      <span class="comment">#:"The environment is composed of all the standard functions, plus replacements for let and lambda."</span>
+      <span class="key">m-environment</span>:[<span class="fn">union</span>
+        {
+          <span class="key">let</span>:[<span class="fn">sub</span> 
+            '[<span class="fn">,dataDeltaR</span> /args/<span class="digits">2</span> <span class="key">env</span>:[<span class="fn">,union</span> [<span class="fn">,mapm</span> /args/<span class="digits">1</span> [<span class="fn">,lambda</span> '[<span class="key">v</span>:<span class="digits">1</span>] '[<span class="fn">,,dataDeltaR</span> v <span class="key">env</span>:call-env <span class="key">delta</span>:-<span class="digits">1</span>]]] call-env] <span class="key">delta</span>:-<span class="digits">1</span>]
+          ]
+          <span class="key">letrec</span>:[<span class="fn">sub</span>
+            '[<span class="fn">,letrec</span> '[<span class="key">new-env</span>:[<span class="fn">,,union</span> [<span class="fn">,,mapm</span> /args/<span class="digits">1</span> [<span class="fn">,,lambda</span> '[<span class="key">v</span>:<span class="digits">1</span>] '[<span class="fn">,,,dataDeltaR</span> v <span class="key">env</span>:new-env <span class="key">delta</span>:-<span class="digits">1</span>]]] call-env]]
+              '[<span class="fn">,,dataDeltaR</span> /args/<span class="digits">2</span> <span class="key">env</span>:new-env <span class="key">delta</span>:-<span class="digits">1</span>]
+            ]
+          ]
+          <span class="key">lambda</span>:[<span class="fn">sub</span> '[<span class="fn">,sub</span>
+          	'[<span class="fn">,,dataDeltaR</span> /def-env/'args/<span class="digits">2</span> <span class="key">env</span>:[<span class="fn">,,union</span> [<span class="fn">,,mapm</span> /def-env/'args/<span class="digits">1</span> [<span class="fn">,,lambda</span> '[<span class="key">v</span>:<span class="digits">1</span>] '/args/v]] /def-env/'call-env] <span class="key">delta</span>:-<span class="digits">1</span>]
+          ]]
+          <span class="key">sub</span>:[<span class="fn">sub</span> '[<span class="fn">,sub</span>
+			'[<span class="fn">,,dataDeltaR</span> /def-env/'args/<span class="digits">1</span> <span class="key">env:{args</span>:args <span class="key">def-env</span>:/def-env/'call-env <span class="key">call-env</span>:call-env} <span class="key">delta</span>:-<span class="digits">1</span>]
+          ]]
+        }
+        original-env
+      ]]
+      <span class="key">'{evaluate</span>:evaluate}
+    ]]
+    
+    '{
+    [<span class="fn">evaluate</span> '[<span class="fn">+</span> <span class="digits">2</span> <span class="digits">3</span>]]
+    [<span class="fn">evaluate</span> '[<span class="fn">+</span> <span class="digits">2</span> [<span class="fn">*</span> <span class="digits">3</span> <span class="digits">5</span>]]]
+    [<span class="fn">evaluate</span> '{[<span class="fn">+</span> <span class="digits">4</span> <span class="digits">5</span>] [<span class="fn">+</span> <span class="digits">2</span> [<span class="fn">*</span> <span class="digits">3</span> <span class="digits">5</span>]]}]
+    [<span class="fn">evaluate</span> '[<span class="fn">*</span> <span class="digits">2</span> [[<span class="fn">if</span> true <span class="key">then</span>:* <span class="key">else</span>:+] <span class="digits">2</span> <span class="digits">5</span>]]]
+    [<span class="fn">evaluate</span> '[<span class="fn">let</span> '[<span class="key">x</span>:[<span class="fn">+</span> <span class="digits">2</span> <span class="digits">3</span>]] '[<span class="fn">*</span> x x]]]
+    [<span class="fn">evaluate</span> '[[<span class="fn">lambda</span> '[<span class="key">n</span>:<span class="digits">1</span>] '[<span class="fn">*</span> n n]] <span class="digits">16</span>]]
+    [<span class="fn">evaluate</span> '[[<span class="fn">lambda</span> '[<span class="key">fac</span>:<span class="digits">0</span> <span class="key">n</span>:<span class="digits">1</span>] '[<span class="fn">if</span> [<span class="fn">=</span> n <span class="digits">1</span>] <span class="key">then</span>:n <span class="key">else</span>:[<span class="fn">*</span> n [<span class="fn">fac</span> [<span class="fn">-</span> n <span class="digits">1</span>]]]]] <span class="digits">10</span>]]
+    [<span class="fn">evaluate</span> '[<span class="fn">mapm</span> '[<span class="fn"><span class="digits">1</span></span> <span class="digits">2</span> <span class="digits">3</span> <span class="digits">4</span> <span class="digits">5</span>] [<span class="fn">lambda</span> '[<span class="key">x</span>:<span class="digits">1</span>] '[<span class="fn">*</span> x <span class="digits">2</span>]]]]
+    }
+]</a>
+</p>

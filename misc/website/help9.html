@@ -1,0 +1,20 @@
+Laziness & transparency
+
+<p>MISC is a lazy, or non-strict, language. This means that values are evaluated by need, and allows for MISC to have no special forms and support infinite data structures. Such as all the positive integers.</p>
+<p>
+<ul>
+<li><a class="example">[numbers from:0]</a> <i>(Control-C stops evaluation)</i>
+<li><a class="example">[take 20 [numbers from:0]]</a>
+</ul>
+</p>
+<p>And it is possible to redefine <b>if</b> without any trouble, because it is not a special form.</p>
+<ul>
+<li><a class="example">[let '[
+    my-if:[lambda '[v:1 then:then else:else]
+        '[if v then:else else:then]
+    ]]
+    '[my-if true then:1 else:-1]
+]</a>
+</ul>
+</p>
+<p>Another aspect of MISC is that it is referentially transparent, which means that an expression can always be replaced with its value. That is, <a class="example">[+ 2 3]</a>, <a class="example">5</a> and indeed <a class="example">[+ 1 [* 2 2]]</a> are all interchangable. This is the reason <b>lambda</b> and <b>let</b> require data as arguments, because<b>[lambda [x:10] [+ 1 2]]</b> is equivalent to <b>[lambda nil 3]</b>.

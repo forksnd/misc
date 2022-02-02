@@ -1,0 +1,13 @@
+Drawing
+
+<p>To make interacting with MISC a bit more visual, if the result of an expression is a valid drawing it will be displayed to the right of the console above. A valid drawing is composed of an array of path elements. Each element is either a move <b>[m x y]</b>, a line <b>[l x y]</b>, a bezier curve <b>[c cx cy cx2 cy2 x y]</b> or a close path segment <b>[z]</b>.</p>
+<ul>
+<li><a class="example">'[[m 100 100] [l 100 200] [l 200 200] [l 200 100] [z]]</a>
+<li><a class="example">'[
+	[m 212.50 150.00] [c 212.50 184.52 184.52 212.50 150.00 212.50]
+	[c 115.48 212.50 87.50 184.52 87.50 150.00] [c 87.50 115.48 115.48 87.50 150.00 87.50]
+	[c 160.97 87.50 171.75 90.39 181.25 95.87] [l 150.00 150.00] [z]
+	[m 200.25 84.87] [c 219.59 96.04 231.50 116.67 231.50 139.00] [l 169.00 139.00] [z]
+]</a>
+</ul>
+<p>Enjoy.</p>

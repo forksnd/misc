@@ -1,0 +1,25 @@
+Metadata in MISC
+
+<p>Metadata is used in MISC by the interpreter for two main purposes. Firstly to store whether an object is data or not, and secondly to store the closure environment. Built-in functions like <b>+</b> do not store a closure environment but bootstrapped functions like <b>and</b> do.</p> 
+<p>
+<ul>
+<li><a class="example">[mapm {a:'[+ 2 3] b:'''[test:123] c:'''72} meta]</a>
+<li><a class="example">[meta +]</a>
+<li><a class="example">[meta and]</a>
+</ul>
+</p>
+</ul>
+<p>MISC also makes use of metadata to store documentation for functions and code. The <b>doc</b> metadata key contains documentation for most functions. The <b>getdoc</b> function simply accesses this value. This metadata can be generated providing literate documentation built-in to the langauge. In-fact most of the examples in the documentation (displayed in <a class="example">[help2]</a>) are generated using the <b>example</b> function.</p>
+<p>
+<ul>
+<li><a class="example">[getdoc take]</a>
+<li><a class="example">[getdoc example]</a>
+<li><a class="example">[letrec '[
+	sqr:[meta+
+		[lambda '[a:1] '[* a a]]
+		{doc:[string+ "Squares a number eg." [example "[sqr 6]"]]}
+	]]
+	'{test:[sqr 12] doc:[getdoc sqr]}
+]</a>
+</ul>
+</p>

@@ -1,0 +1,19 @@
+Data
+
+<p>The <b>eval</b> function unquotes, and by definition evaluates data. The <b>quote</b> function performs the opposite function.
+<p>
+<ul>
+<li><a class="example">'[* 4 12]</a>
+<li><a class="example">[eval '[* 4 12]]</a>
+<li><a class="example">[eval ''[* 4 12]]</a>
+<li><a class="example">[quote '[* 4 12]]</a>
+</ul>
+</p>
+<p>Data can also be unquoted by a comma prefix (this is similar to how data is treated with the backtick quote in LISP). Multiple commas and quotes can be used to create multiple different levels of data.
+<p>
+<ul>
+<li><a class="example">'[4 ,[* 2 2] ,[* 2 4]]</a>
+<li><a class="example">'[4 [* 2 2] [eval [* 2 4]]]</a>
+<li><a class="example">'[a:4 b:,[+ 2 3] c:'[6 7 ,,[* 2 4]]]</a>
+</ul>
+</p>

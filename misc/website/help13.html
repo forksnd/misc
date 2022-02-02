@@ -1,0 +1,21 @@
+Even more on maps
+
+<p>The environment is always available as a map from the function <b>environment</b>. You can find out what values are defined by typing <a class="example">[environment]</a>. Although the <b>help</b> function will display it better.
+<p>
+<p>You might notice the bootstrap contains the map <b>Math</b> which contains mathematical functions. We can make use of these like this:</b>.
+<p>
+<ul>
+<li><a class="example">[keys Math]</a>
+<li><a class="example">[get Math 'pi]</a>
+<li><a class="example">[/Math/'sqrt 70]</a>
+<li><a class="example">[eval in:Math '[sine [pow pi 2]]]</a>
+</ul>
+</p>
+</ul>
+</p>
+<p>The latter example evaluates inside <b>Math</b> so no other names are defined apart from those in <b>Math</b>. This is a problem if we want to use a function like <b>+</b> which is builtin. A solution is to use the <b>let</b> function add the names defined in <b>Math</b> to the current environment.
+<ul>
+<!--<li><a class="example">[eval in:[union [environment] Math] '[sine [+ pi 3]]]</a>-->
+<li><a class="example">[let Math '[sine [+ pi 3]]]</a>
+</ul>
+</p>

@@ -1,0 +1,39 @@
+XML
+
+<p>The functions <b>gen-xml</b> and <b>parse-xml</b> provide a quick method of going between xml and misc. XML is transformed into MISC by mapping a tag to <b>[tag-name [child1 child2 ...] attribute1:"value" att2:"v2" ...]</b>.</p> 
+<p>
+<a href="#" style="font-size:12; color:#000; text-decoration:none; font-family:'Courier', monospace;white-space:pre;" onclick="javascript:parent.appletFrame.miscApplet.runCode(this.text)">[<span class="fn">parse-xml</span> <span class="comment">"&lt;?xml version=\"1.0\"?>
+&lt;catalog>
+&lt;cd title=\"Empire Burlesque\" artist=\"Bob Dylan\" year=\"1985\"/>
+&lt;cd title=\"Hide your heart\" artist=\"Bonnie Tyler\" year=\"1988\"/>
+&lt;cd title=\"One night only\" artist=\"Bee Gees\" year=\"1998\"/>
+&lt;/catalog>"</span>]</a>
+<p>Once in MISC manipulation is simple. This example gets an array of the cd names.</p> 
+<p>
+<a href="#" style="font-size:12; color:#000; text-decoration:none; font-family:'Courier', monospace;white-space:pre;" onclick="javascript:parent.appletFrame.miscApplet.runCode(this.text)">[<span class="fn">mapm</span> /[<span class="fn">parse-xml</span> <span class="comment">"&lt;?xml version=\"1.0\"?>
+&lt;catalog>
+&lt;cd title=\"Empire Burlesque\" artist=\"Bob Dylan\" year=\"1985\"/>
+&lt;cd title=\"Hide your heart\" artist=\"Bonnie Tyler\" year=\"1988\"/>
+&lt;cd title=\"One night only\" artist=\"Bee Gees\" year=\"1998\"/>
+&lt;/catalog>"</span>]/<span class="digits">1</span> [<span class="fn">lambda</span> '[<span class="key">v</span>:value] '/v/'title]]</a>
+<p>More complex transformation are also fairly simple. Like this code which reverses this poem.</p>
+<a href="#" style="font-size:12; color:#000; text-decoration:none; font-family:'Courier', monospace;white-space:pre;" onclick="javascript:parent.appletFrame.miscApplet.runCode(this.text)">[<span class="fn">letrec</span> '[
+    <span class="key">get-child</span>:[<span class="fn">lambda</span> '[<span class="key">tag</span>:<span class="digits">1</span> <span class="key">name</span>:<span class="digits">2</span>] '[<span class="fn">foldm</span> /tag/1 <span class="key">f</span>:[<span class="fn">lambda</span> '[<span class="key">v</span>:value <span class="key">r</span>:<span class="digits">1</span>] '[<span class="fn">if</span> [<span class="fn">=</span> name /v/<span class="digits">0</span>] <span class="key">then</span>:v <span class="key">else</span>:r]]]]
+        
+    <span class="comment">#:"Returns a poem with the title intact and a reversed array of &lt;l> children."</span>
+    <span class="key">transform</span>:[<span class="fn">lambda</span> '[<span class="key">mypoem</span>:1]
+        '{'poem <span class="key">title</span>:/[<span class="fn">get-child</span> mypoem 'title]/<span class="digits">1</span>/<span class="digits">0</span> [reverse [<span class="fn">filter-array</span> /mypoem/<span class="digits">1</span> [<span class="fn">lambda</span> '[<span class="key">v</span>:value] '[<span class="fn">=</span> <span class="comment">"l"</span> /v/<span class="digits">0</span>]]]]}
+    ]
+    ]
+    
+    '[<span class="fn">gen-xml</span> [<span class="fn">transform</span> [<span class="fn">parse-xml</span> <span class="comment">"&lt;?xml version=\"1.0\"?>
+&lt;poem>
+&lt;title>Roses are Red&lt;/title>
+&lt;l>Roses are red,&lt;/l>
+&lt;l>Violets are blue;&lt;/l>
+&lt;l>Sugar is sweet,&lt;/l>
+&lt;l>And I love you.&lt;/l>
+&lt;/poem>"</span>]]
+]
+]</a>
+</p>

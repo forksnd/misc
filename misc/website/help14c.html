@@ -1,0 +1,41 @@
+Metadata styles
+
+<p>Metadata is can be used in MISC to store the appearance or style of the data. The two currently supported keys are <b>color</b> and <b>format</b>. The color is an array of three floats: red, green and blue. The format style metadata is generated automatically by the parser, it contains pretty printing infomation like the key order and comments.</p>
+<p>
+<ul>
+<li><a class="example">42@[style:[color:[1 0 0]]]</a>
+</ul>
+</p>
+</ul>
+<p>Thus reflection can be used to generate syntax coloured programs. Here is a small program that will do a simple syntax colouring of itself!</p>
+<p>
+<ul>
+<li><a class="example">[let '[
+	syntax-color:'[letrec '[
+		number-style:'[style:[color:[0 0 1]]]
+		string-style:'[style:[color:[.1 .4 .1]]]
+		name-style:'[style:[color:[.5 .1 .3]]]
+		fn-style:'[style:[color:[.35 .15 .6]]]
+		key-style:'[style:[color:[.5 .26 0]]]
+		
+		color:[lambda '[f:1 k:key]
+			'[case
+				[number? f]
+				[meta+ f number-style]
+				[name? f]
+				[meta+ f [if [= k 0] then:fn-style else:name-style]]
+				[string? f]
+				[meta+ f string-style]
+				[map? f]
+				[meta= [foldm f f:[lambda '[v:value k:key r:1]
+					'[union [map [meta+ k key-style ] [color v key:k]] r]] id:{}] [meta f]]
+				true
+				"error"
+			]]
+		]
+		'color]
+	]
+	'[[eval syntax-color] syntax-color]
+]</a>
+</ul>
+</p>

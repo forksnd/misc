@@ -1,0 +1,25 @@
+Metadata
+
+<p>Metadata is data about data. Like the author of a novel, their name is not part of the novel but it is information that describes the novel. MISC has strong support for metadata. Every atom can have a metadata map attached to it.</p>
+<p>The syntax used for metadata is an <b>@</b> sign followed by the metadata map.</p> 
+<p>
+<ul>
+<li><a class="example">"A long time ago ..."@[author:"Will"]</a>
+<li><a class="example">[lambda '[a:1 b:2] '[+ a b]]@[doc:"Adds two numbers together"]</a>
+</ul>
+</p>
+</ul>
+</p>
+<p>Metadata can be read and modified using two built-in functions <b>meta</b> and <b>meta=</b>, also <b>meta+</b> a bootstrapped function which unions the old and new metadata. These respectively return the metadata of the first argument and return a new value with its metadata set. Using <b>meta=</b> instead of <b>@</b> allows the metadata to be calculated.</p>
+<p>
+<ul>
+<li><a class="example">[meta 23]</a>
+<li><a class="example">[meta "A long time ago ..."@[author:"Will"]]</a>
+<li><a class="example">[let '[
+	question:[meta= "life" {answer:[* 7 6]}]
+	]
+	'{question [meta question]}
+]</a>
+</ul>
+</p>
+</p>

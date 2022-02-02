@@ -1,0 +1,19 @@
+Substitutions
+
+<p>Substitutions are a more general form of providing functions. A substitution's body is evaluated in an environment where <b>def-env</b>, <b>call-env</b>, <b>args</b> and <b>self</b> are defined. Substitutions can be used to create lots of different behaviours including: macros, lambdas, and functions that take a variable number of arguments.</p>
+<p>
+<ul>
+<li><a class="example">[[sub 42] 1 2 3]</a>
+<li><a class="example">[[sub 'args] 1 2 3]</a>
+<li><a class="example">[let '[+:* f:[sub '[/def-env/'+ /args/1 /args/2]]] '[f 4 5]]</a>
+<li><a class="example">[let '[+:* f:[sub '[/call-env/'+ /args/1 /args/2]]] '[f 4 5]]</a>
+</ul>
+</p>
+<p>A version of lambda can be written using <b>sub</b>. The excessive de-quoting means that the names de-quoted are looked up outside of the substitutions restricted environment. The code below evaluates the body of the lambda in an environment that is made from the union of the lambdas defining environment and a mapping of all the lambda's arguments from the args passed to the function.</p>
+<p>
+<ul>
+<li><a class="example">[sub '[,sub
+  '[,,eval /def-env/'args/2 in:[,,union [,,mapm /def-env/'args/1 [,,sub '[,,,get /def-env/'args /args/1]]] /def-env/'call-env]]
+]]</a>
+</ul>
+</p>

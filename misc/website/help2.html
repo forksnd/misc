@@ -1,0 +1,13 @@
+Maps not lists
+
+<p>The underlying data structure of MISC is the associative array or map. That is, unlike LISP <b>(+ 3 4)</b> is not a list, it is a map which can be written as <a class="example">[0:+ 1:3 2:4]</a>. Everything in MISC is a map.</p>
+<p>This <b>[key:value ...]</b> syntax is the foundation for everything. Any values without keys are numbered from 0 upwards in the order they are written, thus <a class="example">[+ 3 4]</a> is equivalent to <a class="example">[0:+ 1:3 2:4]</a class="example">. Maps are unordered therefore this expression could also be written as <a class="example">[1:3 0:+ 2:4]</a>.</p>
+<p>To enter data, that is not evaluated, in MISC prefix a map with a single quote '. For example, <a class="example">'[apples:100 oranges:23]</a>.</p>
+<p>Try some expressions:
+<ul>
+<li><a class="example">[/ 2:10 1:2]</a>
+<li><a class="example">'[/ 2:10 1:2]</a>
+<li><a class="example">'[a:45 b:[+ 2 3]]</a>
+<li><a class="example">'[will:10 sam:20 isaac:30]</a>
+</ul>
+</p>

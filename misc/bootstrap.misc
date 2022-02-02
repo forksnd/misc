@@ -1,0 +1,505 @@
+[let '[
+	
+	string+:[letrec '[sp:[lambda '[m:1 n:n]
+		'[if /m/n then:[string+ /m/n [sp m n:[+ n 1]]] else:""]
+		]
+		]
+		'[sub '[/def-env/'sp args n:1]]
+	]@[doc:"Appends multiple strings."]
+]
+
+'[letrec '[
+
+>:[meta+ [lambda '[a:1 b:2] '[< b a]] {doc:"If the first argument is greater than the second, true otherwise false."}]
+
+environment:[meta+ [sub 'call-env] {doc:"Returns the current calling environment."}]
+
+array->list:[meta+ [letrec '[
+    a2l:[lambda '[a:1 n:2] '[if [contains? a n] then:{/a/n [a2l a [+ n 1]]} else:{}]]
+    ]
+    '[lambda '[a:1] '[a2l a 0]]
+] {doc:[string+ "Converts an array to a list." [example "[array->list '[a b c d e]]"]]}]
+
+list->array:[meta+ [letrec '[
+    l2a:[lambda '[l:1 n:2] '[if [or [= l {}] [not l]] then:{} else:[union [map n /l/0] [l2a /l/1 [+ n 1]]]]]
+    ]
+    '[lambda '[l:1] '[l2a l 0]]
+] {doc:[string+ "Converts an list ot an array." [example "[list->array '[a [b [[1 2] [c []]]]] ]"]]}]
+
+meta+:[let
+	'[meta+:[lambda '[m:1 p:2] '[let '[mm:[meta m]] '[meta= m [if mm else:p then:[union p mm]]] ]] ]
+	'[meta+ meta+ {doc:"Unions $1 with the metadata of $2"}]
+	]
+
+==:[lambda '[a:1 b:2] '[and [= a b] [= [meta a] [meta b]]]]@[doc:"True if both the arguments are equal and their metadata is equal."]
+
+and:[lambda '[a:1 b:2] '[if a then:b else:false]]@[doc:"Boolean AND of two arguments"]
+or:[lambda '[a:1 b:2] '[if a then:true else:b]]@[doc:"Boolean OR of two arguments"]
+not:[lambda '[a:1] '[if a then:false else:true]]@[doc:"Boolean NOT of first argument"]
+xor:[lambda '[a:1 b:2] '[if a then:[not b] else:b]]@[doc:"Boolean XOR of two arguments"]
+
+name?:[lambda '[a:1] '[and [meta a] [= /[meta a]/"is-name" true]]]@[doc:"True if first argument is a name."]
+
+#:[	
+quote:[lambda '[d:1] '[let
+	'[dl:/[meta d]/'data]
+	'[if [number? dl]
+		then:[meta+ d {data:[+ /[meta d]/'data 1]}]
+		else:d
+	]]]
+]
+
+
+help-disp:[lambda '[f:fn env:env]
+    '[letrec '[
+		display:[lambda '[env:1]
+			'[foldm env
+				f:[lambda '[k:key v:value r:1]
+				    '[f k v r]
+					]
+				id:""
+			]
+			]
+		]
+		'[string+ "BUILT IN
+========
+
+" [display [filter env [lambda '[v:value] '[and [lambda? v] /[meta v]/'builtin]]]] "
+
+BOOTSTRAP
+=========
+
+" [display [filter env [lambda '[v:value] '[and [lambda? v] [not /[meta v]/'builtin]]]]] "
+
+LIBRARIES
+=========
+
+" [display [filter env [lambda '[v:value] '[map? v]]]]
+		]
+	]
+]
+
+help:[meta+ [sub '[,string+ [,help-disp env:call-env
+    fn:[,lambda '[k:1 r:3] '[,,string+ k "  " r]]] "
+		
+		
+---------
+For more detailed help use getdoc. For example '[getdoc filter]'. Or use '[help2]' which prints out all values and their documentation.
+"]]
+	{doc:"Lists all values in the environment."}
+	]
+
+help2:[meta+ [lambda {} '[help-disp  env:[environment]
+    fn:[lambda '[k:1 v:2 r:3] '[string+ k " : " [if [getdoc v] then:[getdoc v] else:""] "
+" r]]] ]
+	{doc:"Lists all values in the environment with their documentation."}
+	]
+
+length:[letrec '[l2:[lambda '[m:1 n:2] '[if [contains? m n] then:[l2 m [+ n 1]] else:n]]]
+	'[lambda '[m:1] '[l2 m 0]]@[doc:"The length of an array."]
+]
+
+append:[letrec '[
+	shift:[lambda '[m:1 shift:2] '[foldm m f:[lambda '[v:value k:key r:1] '[union [map [+ k shift] v] r]] id:{}]]
+	append:[lambda '[a:1 b:2] '[union a [shift b [length a]]]]
+] 'append]
+
+cycle:[meta+ [lambda '[m:1] '[append m [cycle m]]]
+{doc:[string+ "Lists all values in the environment." [example "[take 5 [cycle '[1 2]]]"]]}
+]
+repeat:[meta+ [lambda '[m:1] '[append {m} [repeat m]]]
+{doc:[string+ "Lists all values in the environment." [example "[take 5 [cycle '[1 2]]]"]]}
+]
+	
+getdoc:[meta+ [lambda '[f:1] '[if [meta f] then:[get [meta f] 'doc] else:nil]] {doc:"Returns the doc meta value"}]
+
+example:[meta+
+	[sub '[,string+ "
+    => " /args/1 "
+    " [,display [,eval [,parse /args/1] in:call-env]]]]
+	{doc:[string+ "Computes an example from a string by parsing and evaluating the string. Eg. " [example "[example \"[+ 2 3]\"]"]]}
+	]
+
+foldm:[meta+ [lambda '[m:1 f:f id:id]
+	'[letrec
+		'[
+			mykeys:[keys m]
+			mapmapkeys:[lambda '[n:n]
+				'[let '[key:[get mykeys n]]
+					'[if key
+						then:[f value:[get m key] key:key
+							[mapmapkeys n:[+ n 1]]
+						]
+						else:id
+					]
+				]
+			]
+		]
+		'[mapmapkeys n:0]
+	]
+	]
+	{doc:[string+ "Higher-order function to compute values over the key/value pairs in a map."
+		[example "[foldm {1 2 3 4 5} f:[lambda '[v:value r:1] '[* v r]] id:1]"]
+		[example "[foldm {will:'thimbleby dave:'monck} f:[lambda '[v:value k:key r:1] '[union [map v [string+ \"mr \" k \" \" v]] r]] id:{}]"]
+		]
+	}
+	]
+
+folda:[meta+ [lambda '[m:1 f:f id:id]
+	'[letrec
+		'[
+			maparray:[lambda '[n:n]
+                '[if /m/n
+                    then:[f value:/m/n key:n
+                        [maparray n:[+ n 1]]
+                    ]
+                    else:id
+                ]
+			]
+		]
+		'[maparray n:0]
+	]
+	]
+	{doc:"Higher-order function to compute values over the key/value pairs in an array."
+	}
+	]
+
+zipWith:[meta+ [lambda '[f:using a:1 b:with]
+    '[mapm a [lambda '[v:value k:key] '[f v /b/k]]]
+]
+{doc:[string+ "Makes a map, its elements are calculated from the function applied to the values of the same keys from each map."
+    [example "[zipWith using:+ '[1 2 3] with:'[3 2 1]]"]
+    [example "[zipWith '[1 2 3 4] with:'[2 4 8 16 32] using:/Math/'pow]"]
+]}
+]
+
+zip:[meta+ [lambda '[a:1 b:with]
+    '[mapm a [lambda '[v:value k:key] '{v /b/k}]]
+]
+{doc:[string+ "Makes a map, its elements are the pairs of values of the same keys from each map."
+    [example "[zip '[1 2 3] with:'[9 8 7]]"]
+]}
+]
+
+case:[meta+ [sub '[,eval in:[,union {cargs:args} def-env]
+	'[letrec
+		'[case2:[lambda '[n:n]
+			'[if [contains? cargs n] else:null
+				then:[if /cargs/n
+					then:/cargs/[+ n 1]
+					else:[case2 n:[+ n 2]]
+			]]
+		]]
+		'[case2 n:1]
+	]]
+]
+{doc:[string+ "Returns the first item 2n+1 where item 2n is true."
+    [example "[case [= 3 4] 1 false 2 [= 3 3] 3 true 4]]]"]
+]}
+]
+
+compose:[meta+ [lambda '[f:1 g:2] '[lambda '[v:1] '[f [g v]]] ]
+    {doc:"Combines two single argument functions together, so that [[compose f g] a] is equivalent to [f [g a]]"}
+]
+
+rename:[meta+ [lambda '[m:1 r:names]
+        '[union [foldm r f:[lambda '[v:value k:key r:1] '[union [map k /m/v] r]] id:{}]
+            m
+        ]
+    ]
+    {doc:[string+ "Renames keys in a map."
+        [example "[rename '[1 2 3 4] names:'[0:3 1:2]]"]
+        [example "[rename '[a:test b:123 c:apple] names:'[b:a a:b d:c]]"]
+    ]}
+]
+
+partial-app:[meta+ [lambda '[f:1 curry:fix rn:rename]
+        '[sub '[,apply /def-env/'f [,union /def-env/'curry [,rename args names:/def-env/'rn]] call-env] ]
+    ]
+    {doc:[string+ "Fixes and renames arguments for the function $1 returning a new function.
+Doubling:"
+        [example "[[partial-app * fix:'[2:2] rename:{}] 12]"] "
+Squaring:"
+        [example "[[partial-app * fix:{} rename:'[2:1]] 12]"]
+    ]}
+]
+
+mapm:[meta+
+	[lambda '[m:1 mf:2]
+	'[foldm m f:[lambda '[v:value k:key r:1] '[union [map k [mf v value:v key:k]] r]] id:{}]
+	]
+	{doc:[string+ "Maps the values of the map using f to new values."
+	[example "[mapm {1 2 3 4} [lambda '[v:1] '[* v v]]]"]]}
+	]
+
+filter:[meta+
+	[lambda '[m:1 mf:2]
+	'[foldm m f:[lambda '[v:value k:key r:1] '[if [mf v value:v key:k] then:[union [map k v] r] else:r]] id:{}]
+	]
+	{doc:[string+ "Filters the values of the map $1 using the function $2 which returns a boolean."
+	[example "[filter {red:10 green:3 blue:42 orange:5} [lambda '[v:value] '[< 9 v]]]"]]}
+	]
+
+filter-array:[meta+
+	[lambda '[m:1 mf:2]
+	'[folda m f:[lambda '[v:value k:key r:1] '[if [mf v value:v key:k] then:[append {v} r] else:r]] id:{}]
+	]
+	{doc:"Filters the values of the array $1 using the function $2 which returns a boolean."}
+	]
+
+reverse:[meta+
+	[lambda '[arr:1]
+	'[folda arr f:[lambda '[v:value k:key r:1] '[append r {v}]] id:{}]
+	]
+	{doc:[string+ "Reverses an array." [example "[reverse '[2 3 4 5]]"]]}
+	]
+	
+take:[meta+ [lambda '[from:2 to:1] '[letrec
+		'[
+			takeR:[lambda '[i:1]
+				'[if [= to i] then:{}
+					else:[union [map i [get from i]] [takeR [+ i 1]]]
+				]
+			]
+		]
+		'[takeR 0]
+	]
+	]
+	{doc:[string+ "Takes the first n elements from an array." [example "[take 5 [numbers from:10]]"]]}
+	]
+	
+numbers:[meta+ [lambda '[from:from]
+	'[letrec
+		'[
+			numbersR:[lambda '[m:from i:index]
+				'[union [map i m] [numbersR from:[+ m 1] index:[+ i 1]] ]
+			]
+		]
+		'[numbersR from:from index:0]
+	]
+	]
+	{doc:"An infinite list of numbers starting from 'from'. [numbers from:1] => {1 2 3 4 ...."}
+	]
+
+Math:[meta+ [letrec
+		'[
+			abs:[lambda '[x:1] '[if [< x 0] then:[* x -1] else:x]]
+			cube:[lambda '[x:1] '[* x [* x x]]]
+			p:[lambda '[x:1] '[- [* 3 x] [* 4 [cube x]]]]
+		
+			sine:[lambda '[angle:1]
+				'[if [not [< 0.01 [abs angle]]]
+					then:angle
+					else:[p [sine [/ angle 3.0]]]
+				]
+			]
+			cosine:[lambda '[angle:1]
+				'[sine [+ angle [/ pi 2]]]
+				]
+	
+			sqrt:[lambda '[x:1]
+				'[letrec
+					'[
+						good-enough?:[lambda '[guess:1] '[< [abs [- [* guess guess] x]] 0.001]]
+						improve:[lambda '[guess:1] '[/ [+ guess [/ x guess]] 2]]
+						sqrt-iter:[lambda '[guess:1] '[if [good-enough? guess] then:guess else:[sqrt-iter [improve guess]]]]
+					]
+					'[sqrt-iter x]
+				]
+			]
+			
+			fac-old:[meta+ [lambda '[n:1]
+					'[if [< n 2]
+						then: 1
+						else:[* [fac [- n 1]] n]
+					]
+				]
+				{doc:[string+ "fac computes the factorial of a number." [example "[/Math/'fac 4]"]]}
+				]
+			
+			fac:[meta+ [lambda '[n:1]
+					'[facI [- n 1] n]
+				]
+				{doc:[string+ "fac computes the factorial of a number." [example "[/Math/'fac 4]"]]}
+				]
+			facI:[lambda '[n:!$1 r:!$2]
+					'[if [< n 2]
+						then: r
+						else:[facI [- n 1] [* r n]]
+					]
+				]
+			
+			pow:[lambda '[v:1 n:2]
+				'[if [= n 1]
+					then:v
+					else:[* v [pow v [- n 1]]]
+				]
+			]
+			
+			pi:3.14159265358979323846264338327950288
+			e:2.71828182845904523536028747135266250
+		]
+		
+		'{abs:abs fac:fac pow:pow sine:sine sqrt:sqrt pi:pi e:e}
+	]
+	{doc:[string+ "Mathematical map of constants and functions. Including: " [display [keys Math]]]}
+	]
+	
+gen-xml:[letrec
+		'[
+			xml-attributes:[lambda '[attr:1]
+				'[foldm attr f:[lambda '[k:key v:value r:1] '[if [number? k] then:r else:[string+ " " k "=\"" v "\"" r]]] id:""] ]
+			xml-tag:[lambda '[name:name attributes:attributes children:children]
+				'[string+ "<" name [xml-attributes attributes]
+					[if [and [map? children] [< 0 [length children]]]
+						then:[string+ ">" [foldm children f:[lambda '[k:key v:value r:1] '[string+ [if [string? v] else:[xml-tag2 v] then:v] r]] id:""] "</" name ">"]
+						else:"/>"
+					]
+				]
+			]
+			xml-tag2:[lambda '[tag:1]
+				'[xml-tag name:/tag/0 attributes:tag children:/tag/1]
+			]
+			xml:[lambda '[tag:1]
+				'[string+ "<?xml version=\"1.0\"?>" [xml-tag2 tag]]
+			]
+		]
+		'xml
+	]
+
+SVG:[letrec
+	'[
+		poly:[lambda '[p:points] ''["polygon" 
+			points:,[foldm p f:[lambda '[v:value r:1] '[string+ /v/0 "," /v/1 " " r]] id:""]]
+		]
+		
+		rect:[lambda '[x:x y:y w:width h:height]
+			'[poly points:{{x y} {[+ x w] y}  {[+ x w] [+ y h]} {x [+ y h]} } ]
+		]
+		
+		square:[lambda '[x:x y:y size:size]
+			'[rect x:x y:y width:size height:size]
+		]
+		
+		regular-poly:[lambda '[x:x y:y m:n color:color radius:radius]
+			'[star x:x y:y n:[/ m 2] radius:radius radius2:radius]
+		]
+
+		star:[lambda '[x:x y:y n:n radius:radius radius2:radius2] '[letrec
+			'[
+				sine:/Math/'sine
+				pi:/Math/'pi
+				star-points:[lambda '[m:n a:a isodd:odd]
+					'[if [< m 0]
+						then: '[]
+						
+						else:[letrec
+							'[
+								r:[if isodd then:radius2 else:radius]
+								sx:[+ x [* r [sine [* m a]]]]
+								sy:[+ y [* r [sine [- [* m a] [/ pi 2]]]]]
+							]
+							'[append
+								{{sx sy}}
+								[star-points n:[- m 1] a:a odd:[not isodd]]
+							]
+						]
+					]]
+			]
+			'[poly points:[star-points n:n a:[/ [* 2 pi] n] odd:true]]
+		]
+		]
+	]
+	'{star:star poly:poly rect:rect square:square regular-poly:regular-poly}
+	]
+
+#:[
+
+
+doc:[lambda '[title:title sections:sections]
+		'{'doc title:title sections:[mapm sections
+			[lambda '[v:value k:key]
+				'[if [null? /v/'number] else:v
+					then:[union v {number:[+ k 1]}]
+				]
+			]]
+		}
+	]
+	
+union-null:[lambda '[a:1 key:key value:value] '[if [null? value] then:a else:[union a [map key value]]]]
+
+section:[lambda '[title:title body:1 number:number name:name sections:sections]
+'[let '[a:{'section title:title [if [null? body] then:"" else:body]}]
+	'[if [null? name] then:a
+		else:[union a [map "name" name]]
+	]]
+	'[union-null {'section} key:"number" value:"b"]
+	'[let '[a:[union-null {'section} key:"number" value:"b"]] 'a]
+	'[union-null {'section title:title [if [null? body] then:"" else:body]} key:"name" value:name]
+	'[let '[a:[union-null {'section title:title [if [null? body] then:"" else:body]} key:"name" value:name]] 'a]
+		'[let '[a:[union-null {'section title:title [if [null? body] then:"" else:body]} key:"name" value:name]] 'a
+			'[if [null? sections]
+				then:a
+				else:[union a
+						{sections:[foldm sections id:{} f:
+							[lambda '[v:value k:key r:1]
+								'[if [null? /v/'number] else:[union [map k v] r]
+									then:[union [map k [union v {number:[string+ "A" [+ k 1]]}]] r]
+								]
+							]]
+						}
+					]
+			]
+		]
+	]
+
+ref:[lambda '[name:1 in:in]
+	'[let '[sections:[filter /in/'sections [lambda '[v:value] '[= /v/'name name]]]]
+		'[if [null? /sections/0] then:"?"
+			else:[get /sections/0 "number"]
+		]
+	]
+]
+
+docstring:[lambda '[doc:1]
+	'[string+ "<h1>" /doc/'title "</h1>"
+		[foldm /doc/'sections f:[lambda '[v:value r:1] '[string+ "<h2>" /v/'number ": " /v/'title "</h2>" /v/'$1 r]] id:""]
+	]
+]
+
+pprint:[lambda '[fn:1 depth:depth]
+	'[let '[ppmeta:/[meta fn]/'pretty-print]
+		'[if [and [map? fn] [null? /[meta fn]/'is-name]]
+			then:[string+ "["
+				[[lambda '[rec:0 i:1 n:2] '[let '[mykey:/[keys fn]/i]
+					'[string+
+						#:"Pretty print returns"
+						[if [contains? ppmeta i]
+							then:[string+ "
+" [[lambda '[rec:0 d:1] '[if [< d 0] then:"" else:[string+ "  " [rec [- d 1]]]] ] depth]]
+							else:""
+						]
+						#:"Print keys"
+						[if [contains? [keys fn] i]
+							then:[string+ [if [= i 0] then:"" else:" "]
+								[if [= mykey n] then:"" else:[string+ mykey ":"]]
+								[pprint [get fn mykey] depth:[+ 1 depth]]
+								
+								[rec [+ i 1] [if [number? mykey] then:[+ mykey 1] else:n]]
+							]
+						else:""]
+					]]]
+					0 0 depth:0]
+				"]"
+			]
+			else:fn
+		]
+	]
+]
+]
+
+
+]
+'[environment]
+]
+]

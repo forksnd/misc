@@ -1,0 +1,13 @@
+Names
+
+<p>To define a name you can use <b>let</b>. This function takes two arguments and creates new named values. A simple example is <a class="example">[let '[x:10] '[* 2 x]]</a>.</p>
+<p>Notice how both arguments are data (prefixed with a quote). This is because MISC has no special forms, if the arguments are not quoted then they will be evaluated before the let. MISC also provides <b>letrec</b> which allows names to reference themselves.</p>
+<p>To make a name explicit it can be prefixed by a dollar sign. By default numbers are data, to use a number as a name it can be written explicitly like <b>$2</b>.</p>
+<ul>
+<li><a class="example">[let '[x:10 y:2] '[/ x y]]</a>
+<li><a class="example">[let '[2 4 8 16] '[- $3 1]]</a>
+<li><a class="example">[let '[2 4 8 16] '[- $3 $1]]</a>
+<li><a class="example">[let '[pi:3.1415 radius:10] '[* pi [* radius radius]]]</a>
+<li><a class="example">[letrec '[a:2 b:[+ 10 a]] '[+ a b]]</a>
+</ul>
+</p>

@@ -1,0 +1,24 @@
+Lambda 2
+
+<p>To be more useful, functions need to be named. To give functions names they should be wrapped in a <b>let</b> function.</p>
+<p>
+<ul>
+<li><a class="example">[let '[square:[lambda '[x:1] '[* x x]]]
+    '[square 12]
+]</a>
+<li><a class="example">[let '[circumference:[lambda '[r:radius] '[* 3.1415 [* r r]]]]
+    '[+ [circumference radius:10] [circumference radius:5]]
+]</a>
+<li><a class="example">[letrec '[
+    square:[lambda '[x:1] '[* x x]]
+    sum-of-squares:[lambda '[a:1 b:2] '[+ [square a] [square b]]]
+    ]
+    '[sum-of-squares [+ 5 1] [* 5 2]]
+]</a>
+<li><a class="example">[let '[
+    square:[lambda '[x:1 y:2 w:3] '{{'m x y} {'l [+ x w] y} {'l [+ x w] [+ y w]} {'l x [+ y w]} '[z]}]
+    ]
+    '[append [square 100 100 50] [append [square 160 100 40] [square 210 100 30]]]]
+]</a>
+</ul>
+</p>

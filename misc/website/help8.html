@@ -1,0 +1,16 @@
+Recursion
+
+<p>We can now create recursive functions like factorial. Recursive functions have to be defined inside a <b>letrec</b> so that they can reference themselves. This is a recursive version of factorial</p>
+<p>
+<ul>
+<li><a class="example">[letrec '[
+    factorial:[lambda '[n:1]
+        '[if [= n 1]
+            then:1
+            else:[* n [factorial [- n 1]]]
+        ]
+    ]]
+    '[factorial 25]
+]</a>
+</ul>
+</p>
